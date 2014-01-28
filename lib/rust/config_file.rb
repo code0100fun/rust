@@ -27,7 +27,7 @@ module Rust
       end
 
       def delete
-        # FileUtils.rm_rf(File.dirname(file_name))
+        FileUtils.rm_rf(file_name)
       end
 
       def init_file
