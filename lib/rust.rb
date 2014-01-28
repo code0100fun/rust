@@ -1,5 +1,3 @@
 require "rust/version"
-
-module Rust
-  # Your code goes here...
-end
+require_relative "rust/config_file"
+require_relative "rust/config"
