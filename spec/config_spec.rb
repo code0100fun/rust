@@ -1,18 +1,50 @@
 require 'spec_helper'
+require 'securerandom'
 require_relative '../lib/rust/config'
 
 describe Rust::Config do
-  let(:filename){ File.expand_path("config/config.yml", File.dirname(__FILE__)) }
+  let(:config) { Rust::Config.new }
+
   before do
-    Rust::ConfigFile.stub(:file_name).and_return(filename)
+    path = "config/#{SecureRandom.hex(7)}_config.yml"
+    @filename = File.expand_path(path, File.dirname(__FILE__))
+    config.stub(:file_name).and_return(@filename)
   end
+
   after do
-    # Rust::ConfigFile.delete
+    config.delete
   end
+
   describe "#options" do
     it "has empty hash when no options have been set" do
-      expect(Rust::Config.options).to be_a(Hash)
-      expect(Rust::Config.options).to be_empty
+      expect(config.options).to be_a(Hash)
+      expect(config.options).to be_empty
+    end
+  end
+
+  describe "#save" do
+    it "writes options to config file" do
+      config.options['foo'] = 'bar'
+      config.save
+      expect(config.options).to eq({'foo' => 'bar'})
+    end
+  end
+
+  describe "#token" do
+    context "token has been set" do
+      it "returns the token" do
+        config.token = 'foo'
+        expect(config.token).to eq('foo')
+      end
+    end
+  end
+
+  describe "#token" do
+
+    context "token has not been set" do
+      it "returns the token" do
+        expect(config.token).to eq(nil)
+      end
     end
   end
 end

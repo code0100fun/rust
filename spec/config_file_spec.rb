@@ -3,7 +3,7 @@ require 'securerandom'
 require_relative '../lib/rust/config_file'
 
 describe Rust::ConfigFile do
-  let(:config) { Rust::ConfigFile }
+  let(:config) { Rust::ConfigFile.new }
 
   before do
     path = "config/#{SecureRandom.hex(7)}_config.yml"
@@ -12,7 +12,7 @@ describe Rust::ConfigFile do
   end
 
   after do
-    Rust::ConfigFile.delete
+    config.delete
   end
 
   describe "#create" do
