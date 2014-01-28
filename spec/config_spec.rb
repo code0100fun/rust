@@ -37,9 +37,6 @@ describe Rust::Config do
         expect(config.token).to eq('foo')
       end
     end
-  end
-
-  describe "#token" do
 
     context "token has not been set" do
       it "returns the token" do
