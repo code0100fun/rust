@@ -5,7 +5,11 @@ require_relative '../lib/rust/authenticate'
 
 describe Rust::Authenticate do
   let(:auth) { Rust::Authenticate.new }
-  let(:config) { Rust::Config.new }
+  let(:filename) do
+    path = "config/#{SecureRandom.hex(7)}_config.yml"
+    File.expand_path(path, File.dirname(__FILE__))
+  end
+  let(:config) { Rust::Config.new(filename) }
 
   before do
     path = "config/#{SecureRandom.hex(7)}_config.yml"
@@ -14,8 +18,8 @@ describe Rust::Authenticate do
   end
 
   describe "#login" do
-    it "connects to ClanForge and authenticates" do
-      # auth.login 'ozone1015@gmail.com', ''
+    xit "connects to ClanForge and authenticates" do
+      auth.login 'ozone1015@gmail.com', ''
       expect(config.cookie).to_not be_nil
     end
   end

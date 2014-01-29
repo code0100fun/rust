@@ -14,14 +14,15 @@ Gem::Specification.new do |spec|
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  spec.executables   = ['rust']
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "highline"
   spec.add_development_dependency "capybara"
   spec.add_development_dependency "poltergeist"
   spec.add_development_dependency "capybara-webkit"
+  spec.add_development_dependency "colorize"
+  spec.add_development_dependency "pry"
 end

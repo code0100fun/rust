@@ -17,14 +17,18 @@ module Rust
     def config
       @_config ||= Rust::Config.new
     end
+
     def login username, password
       visit(Rust::Api.login)
       fill_in :credential_0, :with => username
       fill_in :credential_1, :with => password
       click_button 'Login »'
+      sleep 1
       unless /#{username}/.match(page.body).nil?
         cookies = page.driver.browser.get_cookies
         config.cookie = cookies.join('; ')
+        config.token = page.evaluate_script('CF.token.toString()')
+        config.server = page.evaluate_script('CF.accounts()[0].servers()[0].serverid()')
       end
 
     end

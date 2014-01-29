@@ -3,13 +3,11 @@ require 'securerandom'
 require_relative '../lib/rust/config_file'
 
 describe Rust::ConfigFile do
-  let(:config) { Rust::ConfigFile.new }
-
-  before do
+  let(:filename) do
     path = "config/#{SecureRandom.hex(7)}_config.yml"
-    @filename = File.expand_path(path, File.dirname(__FILE__))
-    config.stub(:file_name).and_return(@filename)
+    File.expand_path(path, File.dirname(__FILE__))
   end
+  let(:config) { Rust::ConfigFile.new(filename) }
 
   after do
     config.delete
@@ -18,7 +16,7 @@ describe Rust::ConfigFile do
   describe "#create" do
     it "creates the output directory if it does not exist" do
       config.create
-      expect(File.exists?(@filename)).to eq(true)
+      expect(File.exists?(filename)).to eq(true)
     end
   end
 

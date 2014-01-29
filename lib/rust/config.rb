@@ -1,29 +1,36 @@
-require_relative "./config_file"
+require_relative './config_file'
 
 module Rust
   class Config
 
+    def initialize(filename=nil)
+      @filename = filename
+    end
+
+    def filename
+      config_file.filename
+    end
+
     def delete
-      config_file.delete
+      @_config_file.delete
       @_config_file = nil
     end
 
     def config_file
-      @_config_file ||= Rust::ConfigFile.new
+      @_config_file ||= Rust::ConfigFile.new @filename
     end
 
     def options
-      @_options ||= config_file.read
+      config_file.read
     end
 
-    def save
-      config_file.write options
-      @_options = nil
+    def save options
+      config_file.write(options)
     end
 
     def clear_login
-      token = cookie = nil
-      save
+      self.token = nil
+      self.cookie = nil
     end
 
     def need_login?
@@ -39,7 +46,7 @@ module Rust
     end
 
     def cookie= cookie
-      options['cookie']
+      save options.tap {|o| o['cookie'] = cookie}
     end
 
     def server
@@ -47,7 +54,7 @@ module Rust
     end
 
     def server= server
-      options['server'] = server
+      save options.tap {|o| o['server'] = server}
     end
 
     def token
@@ -55,8 +62,7 @@ module Rust
     end
 
     def token= token
-      options['token'] = token
-      save
+      save options.tap {|o| o['token'] = token}
     end
 
   end

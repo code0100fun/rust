@@ -3,16 +3,23 @@ require 'securerandom'
 require_relative '../lib/rust/config'
 
 describe Rust::Config do
-  let(:config) { Rust::Config.new }
-
-  before do
+  let(:filename) do
     path = "config/#{SecureRandom.hex(7)}_config.yml"
-    @filename = File.expand_path(path, File.dirname(__FILE__))
-    config.stub(:file_name).and_return(@filename)
+    File.expand_path(path, File.dirname(__FILE__))
   end
+  let(:config) { Rust::Config.new(filename) }
+  let(:config2) { Rust::Config.new(filename) }
 
   after do
     config.delete
+  end
+
+  describe "option sync" do
+    it "separate instances see the same config options" do
+      config2.server = "bar"
+      config.cookie = "foo"
+      expect(config2.cookie).to eq("foo")
+    end
   end
 
   describe "#options" do
@@ -24,8 +31,9 @@ describe Rust::Config do
 
   describe "#save" do
     it "writes options to config file" do
-      config.options['foo'] = 'bar'
-      config.save
+      options = config.options
+      options['foo'] = 'bar'
+      config.save options
       expect(config.options).to eq({'foo' => 'bar'})
     end
   end
