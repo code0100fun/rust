@@ -10,7 +10,6 @@ module Rust
 
       def fetch
         result = Rust::Api.get(:logged_in)
-        require 'pry'; binding.pry
         config.token = result["cftoken"]
         config.user = result["user"]
       end

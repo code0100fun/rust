@@ -18,9 +18,13 @@ module Rust
       history_config.write hist
     end
 
+    def current_input
+
+    end
+
     def setup_readline
       command_proc = proc do |s|
-        commands.grep(/^#{Regexp.escape(s)}/)
+        (commands+custom_commands).sort.grep(/^#{Regexp.escape(s)}/)
       end
       Readline.completion_proc = command_proc
       Readline.completion_append_character = ""
@@ -28,13 +32,17 @@ module Rust
     end
 
     def commands
-      ['teleport', 'topos ']
+      ['teleport', 'topos', 'toplayer']
     end
 
     def command_methods
       {
-        'teleport' => ['topos']
+        'teleport.' => ['topos', 'toplayer']
       }
+    end
+
+    def custom_commands
+      ['servers','players']
     end
 
     def run
@@ -76,14 +84,14 @@ module Rust
     def ask_no_echo prompt
       @state = `stty -g`
       system "stty raw -echo -icanon isig"
-      line = ask prompt
+      line = ask prompt,false
       system "stty #{@state}"
       print "\n"
       line
     end
 
-    def ask prompt, options={}
-      Readline.readline(prompt, true)
+    def ask prompt, add_hist=true
+      Readline.readline(prompt, add_hist)
     end
 
     def login
@@ -96,12 +104,13 @@ module Rust
         if config.cookie.nil?
           puts "Error logging in!".red
         else
+          puts "Connected".green
           puts "Fetching user data...".colorize(:light_cyan)
           Rust::User.fetch
           if config.token.nil?
             puts "Could not get a token for #{email}".red
           else
-            puts "Successfully logged in as #{email}"
+            puts "Successfully logged in as #{email}".green
             puts "Fetching server list...".colorize(:light_cyan)
             Rust::Servers.fetch
             if config.servers.nil?

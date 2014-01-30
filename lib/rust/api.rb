@@ -1,6 +1,12 @@
+require 'cgi'
+
 module Rust
   class Api
     class << self
+
+      def command_uri
+        URI "https://#{Rust::Api.host}#{Rust::Api.command}"
+      end
 
       def login_uri
         URI "https://#{host}#{login}"
@@ -35,7 +41,7 @@ module Rust
       end
 
       def get uri, &block
-        request :post, uri, &block
+        request :get, uri, &block
       end
 
       def post uri, &block
@@ -47,17 +53,28 @@ module Rust
         uri = send(method)
       end
 
+      def parse_cookie cookie
+        cookie = cookie.split(';').first.split('=')
+        cookie_hash = {}
+        cookie_hash[cookie[0]] = cookie[1]
+        cookie_hash
+      end
+
       def request method, uri
         uri = symbol_to_uri(uri)
         req = http_methods[method].new uri
         configure_request req
         yield(req) if block_given?
         res = send_request req
-        cookie = res.get_fields('Set-Cookie')
-        config.cookie = cookie.first unless cookie.nil?
+        cookie = res.get_fields('Set-Cookie').first
+        unless cookie.nil?
+          cookie = parse_cookie cookie
+          config.add_cookies cookie
+        end
         begin
           JSON.parse res.body
         rescue
+          { "status" => res.code, "message" => res.message }
         end
       end
 
@@ -77,7 +94,6 @@ module Rust
 
       def configure_request req
         req['Cookie'] = config.cookie
-        require 'pry'; binding.pry
         req['User-Agent'] = user_agent
         req
       end

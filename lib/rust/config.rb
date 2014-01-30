@@ -12,7 +12,7 @@ module Rust
     end
 
     def delete
-      @_config_file.delete
+      @_config_file.delete unless @_config_file.nil?
       @_config_file = nil
     end
 
@@ -41,31 +41,35 @@ module Rust
       server.nil?
     end
 
-    def cookie
-      options['cookie']
+    def cookies
+      options['cookies'] || {}
     end
 
-    def cookie= cookie
-      save options.tap {|o| o['cookie'] = cookie}
+    def cookies= cookies
+      save options.tap {|o| o['cookies'] = cookies}
+    end
+
+    def add_cookies cookies
+      cookies = self.cookies.merge!(cookies)
+      self.cookies = cookies
+    end
+
+    def cookie
+      cookies.map {|k,v| "#{k}=#{v}" }.join('; ')
     end
 
     def server
-      options['server']
-    end
-
-    def server= server
-      save options.tap {|o| o['server'] = server}
+      servers.first
     end
 
     def servers
       options['servers']
     end
 
-    def servers= server
-      save options.tap do |o|
-        o['servers'] = servers
-        server = servers.first
-      end
+    def servers= servers
+      options = self.options
+      options['servers'] = servers
+      save options
     end
 
     def token

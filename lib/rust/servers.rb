@@ -21,7 +21,7 @@ module Rust
         @_config ||= Rust::Config.new
       end
 
-      def form username, password
+      def form
         {
           accountserviceid: config.account_service_id,
           cftoken: config.token

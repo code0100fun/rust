@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_relative '../lib/rust/config'
 
 describe Rust::Config do
 
