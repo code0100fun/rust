@@ -57,12 +57,35 @@ module Rust
       save options.tap {|o| o['server'] = server}
     end
 
+    def servers
+      options['servers']
+    end
+
+    def servers= server
+      save options.tap do |o|
+        o['servers'] = servers
+        server = servers.first
+      end
+    end
+
     def token
       options['token']
     end
 
     def token= token
       save options.tap {|o| o['token'] = token}
+    end
+
+    def user
+      options['user']
+    end
+
+    def user= user
+      save options.tap {|o| o['user'] = user}
+    end
+
+    def account_service_id
+      user['accountservices'].first['accountserviceid']
     end
 
   end

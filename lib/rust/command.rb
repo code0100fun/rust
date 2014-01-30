@@ -58,18 +58,6 @@ module Rust
       }
     end
 
-    def data
-      URI.encode_www_form form
-    end
-
-    def headers
-      {
-        'Cookie' => config.cookie,
-        'Content-Type' => 'application/x-www-form-urlencoded',
-        'Accept' => 'application/json'
-      }
-    end
-
     def uri
       URI "https://#{Rust::Api.host}#{Rust::Api.command}"
     end

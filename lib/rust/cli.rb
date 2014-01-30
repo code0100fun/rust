@@ -89,25 +89,30 @@ module Rust
     def login
       while config.need_login?
         puts "You must login to Multiplay".colorize(:light_cyan)
-        email = ask("Multiplay Email:  ")
-        password = ask_no_echo("Multiplay Password:  ")
-        auth = Rust::Authenticate.new
+        email = ask("Multiplay Email: ")
+        password = ask_no_echo("Multiplay Password:")
         puts "Connecting to Multiplay...".colorize(:light_cyan)
-        auth.login email.to_s, password.to_s
-        if config.need_login?
-          unsuccessful_login
+        Rust::Session.create email, password
+        if config.cookie.nil?
+          puts "Error logging in!".red
         else
-          successful_login(email.to_s)
+          puts "Fetching user data...".colorize(:light_cyan)
+          Rust::User.fetch
+          if config.token.nil?
+            puts "Could not get a token for #{email}".red
+          else
+            puts "Successfully logged in as #{email}"
+            puts "Fetching server list...".colorize(:light_cyan)
+            Rust::Servers.fetch
+            if config.servers.nil?
+              puts "Failed to get a list of servers for #{email}".red
+            else
+              puts "Found #{config.servers.length} servers".green
+            end
+          end
+
         end
       end
-    end
-
-    def unsuccessful_login
-      puts "Error logging in!".red
-    end
-
-    def successful_login email
-      puts "Logged in as #{email}".green
     end
 
     def handle_response res
