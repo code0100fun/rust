@@ -103,9 +103,7 @@ module Rust
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.77 Safari/537.36'
       end
 
-      def config
-        @_config ||= Rust::Config.new
-      end
+      include Rust::Configurable
 
     end
   end

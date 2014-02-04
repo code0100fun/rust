@@ -37,7 +37,7 @@ describe Rust::Cli do
     end
 
     context "when no cached login info found" do
-      it "asks user fo login information" do
+      xit "asks user fo login information" do
         expect(@reader.gets).to include("You must login to Multiplay")
         @writer.puts "ozone1015@gmail.com"
         expect(@reader.gets).to include("Multiplay Email: ozone1015@gmail.com")

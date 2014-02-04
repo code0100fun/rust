@@ -20,13 +20,10 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "capybara"
-  spec.add_development_dependency "poltergeist"
-  spec.add_development_dependency "capybara-webkit"
-  spec.add_development_dependency "highline"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "pry"
-  spec.add_development_dependency "rb-readline"
-  spec.add_development_dependency "active_support"
-  spec.add_development_dependency "colorize"
+  spec.add_runtime_dependency "highline"
+  spec.add_runtime_dependency "rb-readline"
+  spec.add_runtime_dependency "active_support"
+  spec.add_runtime_dependency "colorize"
 end
