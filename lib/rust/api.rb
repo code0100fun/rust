@@ -66,8 +66,9 @@ module Rust
         configure_request req
         yield(req) if block_given?
         res = send_request req
-        cookie = res.get_fields('Set-Cookie').first
+        cookie = res.get_fields('Set-Cookie')
         unless cookie.nil?
+          cookie = cookie.first
           cookie = parse_cookie cookie
           config.add_cookies cookie
         end

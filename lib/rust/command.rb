@@ -13,9 +13,7 @@ module Rust
 
     private
 
-    def config
-      @_config ||= Rust::Config.new
-    end
+    include Rust::Configurable
 
     def form
       {

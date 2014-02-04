@@ -30,7 +30,7 @@ module Rust
 
     def clear_login
       self.token = nil
-      self.cookie = nil
+      self.cookies = nil
     end
 
     def need_login?

@@ -1,82 +1,57 @@
+require_relative '../lib/rust'
 require 'spec_helper'
-require_relative '../lib/rust/config'
 
-describe Rust::Config do
+describe Rust::Cli do
 
-  describe "option sync" do
-    it "separate instances see the same config options" do
-      config.cookies = {"foo" => "bar"}
-      expect(config2.cookies).to eq({"foo" => "bar"})
+  describe "login prompt" do
+    let(:cli) do
+      puts config.filename
+      Rust::Cli.any_instance.stub(:config).and_return(config)
+      Rust::User.any_instance.stub(:config).and_return(config)
+      Rust::Servers.any_instance.stub(:config).and_return(config)
+      Rust::Command.any_instance.stub(:config).and_return(config)
+      Rust::Cli.new
     end
-  end
 
-  describe "#options" do
-    it "has empty hash when no options have been set" do
-      expect(config.options).to be_a(Hash)
-      expect(config.options).to be_empty
+    before do
+      puts config.filename
+      fork_reader, @writer = IO.pipe
+      @reader, fork_writer = IO.pipe
+
+      puts cli.config.filename
+      @pid = fork do
+        @reader.close
+        @writer.close
+        $stdout = fork_writer
+        $stdin = fork_reader
+        cli.execute!
+      end
+      puts "start #{@pid}"
+      fork_writer.close
+      fork_reader.close
     end
-  end
 
-  describe "#save" do
-    it "writes options to config file" do
-      options = config.options
-      options['foo'] = 'bar'
-      config.save options
-      expect(config.options).to eq({'foo' => 'bar'})
+    after do
+      puts "kill #{@pid}"
+      Process.kill("HUP", @pid)
     end
-  end
 
-  describe "#cookies" do
-    context "no cookies are stored" do
-      it "returns an empty array" do
-        expect(config.cookies).to be_a(Hash)
-        expect(config.cookies).to be_empty
+    context "when no cached login info found" do
+      it "asks user fo login information" do
+        expect(@reader.gets).to include("You must login to Multiplay")
+        @writer.puts "ozone1015@gmail.com"
+        expect(@reader.gets).to include("Multiplay Email: ozone1015@gmail.com")
+        @writer.puts "manbearpig"
+        expect(@reader.gets).to include("Multiplay Password:")
+        expect(@reader.gets).to include("Connecting to Multiplay...")
+        expect(@reader.gets).to include("Connected")
+        expect(@reader.gets).to include("Fetching user data...")
+        puts "token: #{config.token}"
+        expect(@reader.gets).to include("Successfully logged in as ozone1015@gmail.com")
+        expect(@reader.gets).to include("Fetching server lust...")
+        expect(@reader.gets).to include("Found 1 servers")
       end
     end
   end
 
-  describe "#cookie" do
-    it "concatenates cookies into one line" do
-      config.cookies = {"foo" => "bar", "baz" => "qux"}
-      expect(config.cookie).to eq("foo=bar; baz=qux")
-    end
-  end
-
-  describe "#cookie" do
-    it "concatenates cookies into one line" do
-      config.cookies = {"foo" => "bar", "baz" => "qux"}
-      expect(config.cookie).to eq("foo=bar; baz=qux")
-    end
-  end
-
-  describe "#add_cookies" do
-    it "concatenates cookies into one line" do
-      config.cookies = {"foo" => "bar"}
-      config.add_cookies({"baz" => "qux"})
-      expect(config.cookies).to eq({"foo" => "bar", "baz" => "qux"})
-      expect(config.cookie).to eq("foo=bar; baz=qux")
-    end
-
-    it "overwrites old cookie with the same name" do
-      config.cookies = {"foo" => "bar"}
-      config.add_cookies({"foo" => "baz"})
-      expect(config.cookies).to eq({"foo" => "baz"})
-      expect(config.cookie).to eq("foo=baz")
-    end
-  end
-
-  describe "#token" do
-    context "token has been set" do
-      it "returns the token" do
-        config.token = 'foo'
-        expect(config.token).to eq('foo')
-      end
-    end
-
-    context "token has not been set" do
-      it "returns the token" do
-        expect(config.token).to eq(nil)
-      end
-    end
-  end
 end

@@ -1,11 +1,18 @@
-require "readline"
+require 'readline'
 require 'colorize'
 
 module Rust
   class Cli
+
+    include Rust::Configurable
+
     def initialize
       restore_history
       setup_readline
+    end
+
+    def execute!
+      run
     end
 
     def restore_history
@@ -50,7 +57,9 @@ module Rust
       begin
         while !quit?
           command_text = ask("> ")
-          if command_text.chomp == "exit"
+          if command_text.nil?
+            quit true
+          elsif command_text.chomp == "exit"
             quit
           else
             command = Rust::Command.new command_text
@@ -63,18 +72,14 @@ module Rust
       end
     end
 
-    def quit
+    def quit silent=false
       @_quit = true
-      puts "exiting..."
+      puts "exiting..." unless silent
       save_history
     end
 
     def quit?
       @_quit ||= false
-    end
-
-    def config
-      @_config ||= Rust::Config.new
     end
 
     def history_config
@@ -97,8 +102,8 @@ module Rust
     def login
       while config.need_login?
         puts "You must login to Multiplay".colorize(:light_cyan)
-        email = ask("Multiplay Email: ")
-        password = ask_no_echo("Multiplay Password:")
+        email = ask("Multiplay Email: ").chomp
+        password = ask_no_echo("Multiplay Password:").chomp
         puts "Connecting to Multiplay...".colorize(:light_cyan)
         Rust::Session.create email, password
         if config.cookie.nil?
@@ -108,6 +113,7 @@ module Rust
           puts "Fetching user data...".colorize(:light_cyan)
           Rust::User.fetch
           if config.token.nil?
+            puts config.filename
             puts "Could not get a token for #{email}".red
           else
             puts "Successfully logged in as #{email}".green
@@ -131,8 +137,13 @@ module Rust
         puts res["message"].red
         if res["status"] == "422"
           config.clear_login
+          puts res.inspect
           login
         end
+      else
+        config.clear_login
+        puts res.inspect
+        login
       end
     end
 

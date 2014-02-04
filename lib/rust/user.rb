@@ -12,13 +12,12 @@ module Rust
         result = Rust::Api.get(:logged_in)
         config.token = result["cftoken"]
         config.user = result["user"]
+        puts config.filename
       end
 
       private
 
-      def config
-        @_config ||= Rust::Config.new
-      end
+      include Rust::Configurable
 
     end
   end

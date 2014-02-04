@@ -16,10 +16,6 @@ module Rust
 
       private
 
-      def config
-        @_config ||= Rust::Config.new
-      end
-
       def form username, password
         {
           credential_0: username,
