@@ -84,7 +84,7 @@ module Rust
 
 
     def windows?
-      ENV['SYSTEMROOT'] == "C:\\WINDOWS"
+      ENV['SYSTEMROOT'] =~ /C:\\WINDOWS/i
     end
 
     def ask_no_echo prompt

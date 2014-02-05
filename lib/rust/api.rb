@@ -88,6 +88,7 @@ module Rust
       def send_request req
         http = Net::HTTP.new req.uri.hostname, req.uri.port
         http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         http.start do |http|
           http.request req
         end
