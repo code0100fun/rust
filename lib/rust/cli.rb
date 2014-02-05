@@ -25,10 +25,6 @@ module Rust
       history_config.write hist
     end
 
-    def current_input
-
-    end
-
     def setup_readline
       command_proc = proc do |s|
         (commands+custom_commands).sort.grep(/^#{Regexp.escape(s)}/)
@@ -86,11 +82,20 @@ module Rust
       @_history_config = Rust::ConfigFile.new 'history.yml'
     end
 
+
+    def windows?
+      ENV['SYSTEMROOT'] == "C:\\WINDOWS"
+    end
+
     def ask_no_echo prompt
-      @state = `stty -g`
-      system "stty raw -echo -icanon isig"
+      unless windows?
+        @state = `stty -g`
+        system "stty raw -echo -icanon isig"
+      end
       line = ask prompt,false
-      system "stty #{@state}"
+      unless windows?
+        system "stty #{@state}"
+      end
       print "\n"
       line
     end
