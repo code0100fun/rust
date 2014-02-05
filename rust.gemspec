@@ -22,7 +22,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "pry"
-  spec.add_runtime_dependency "highline"
   spec.add_runtime_dependency "rb-readline"
   spec.add_runtime_dependency "active_support"
   spec.add_runtime_dependency "colorize"
